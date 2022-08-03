@@ -1,0 +1,29 @@
+version: '3' 
+
+services:
+  db:
+    image: mysql:5.6
+    volumes:
+      - ./data/db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "docker"
+      MYSQL_DATABASE: "wordpress"
+  
+  wp:
+    image: local/wp
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    ports:
+      - "8000:80"
+    volumes:
+      # config
+      - ./.docker/wp/000-default.conf:/etc/apache2/sites-available/000-default.conf
+      
+      # files
+      - ./web:/var/www/html/web
+      - ./.env:/var/www/html/.env
+      - ./vendor:/var/www/html/vendor
+      - ./config:/var/www/html/config
